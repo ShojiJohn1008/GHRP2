@@ -98,29 +98,39 @@ form{display:grid; gap:16px; padding:18px}
 details{background:#0e1426; border:1px solid var(--line); border-radius:12px; padding:10px 12px}
 summary{cursor:pointer}
 
-/* ====== ブレイクポイント調整（見やすさ優先） ====== */
+/* === 入力グリッドのラッパー === */
+.grid-wrap{
+  position: relative;
+  overflow-x: auto;       /* 横スクロール許可（必要時のみ出る） */
+  -webkit-overflow-scrolling: touch; /* iOS慣性 */
+  padding-bottom: 4px;    /* スクロールバーと干渉しない余白 */
+  mask-image: linear-gradient(to right, transparent 0, black 16px, black calc(100% - 16px), transparent 100%);
+}
 
-/* タブレット未満：ボタンを縦積み、余白ゆったり */
+/* 3列で折り返し（通常） */
+.grid{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(140px, 1fr));
+  gap: 12px;
+  min-height: 0;
+}
+
+/* 入力カードは既存の .field でOK（大きさだけ微調整したいならここで） */
+
+/* --- 極小端末だけ：横スクロール優先モード ---
+   端末幅が非常に狭い時、3列を維持すると潰れる。
+   そこでグリッド自体に最小幅を与えて、横スクロールで逃がす。
+*/
+@media (max-width: 380px){
+  .grid{
+    grid-template-columns: repeat(3, 160px); /* 3列を維持 */
+    width: max(100%, 520px);                 /* コンテンツ最小幅 → はみ出した分は横スクロール */
+  }
+}
+
+/* タブレット未満はボタン縦積み（既存の指定があればそのままでOK） */
 @media (max-width: 720px){
-  main{padding:0 12px}
-  .row{flex-direction:column; align-items:stretch}
-  .btn{width:100%}
-  .kv{grid-template-columns: 1fr} /* ラベル→内容を縦積み */
-  .kv .k{font-weight:700}
+  .row{ flex-direction: column; align-items: stretch; }
+  .btn{ width: 100%; }
 }
 
-/* スマホ小さめ：最小カラム幅をさらに広く、1〜2列に収める */
-@media (max-width: 560px){
-  .grid{grid-template-columns: repeat(auto-fit, minmax(160px, 1fr))}
-  header p{line-height:1.5}
-  .card{border-radius:14px}
-  .field{padding:12px}
-  .field input{padding:12px 14px; font-size:1.06rem}
-}
-
-/* 極小端末：1列固定で確実に読みやすく */
-@media (max-width: 400px){
-  .grid{grid-template-columns: 1fr}
-  body{font-size: clamp(15px, 4vw, 16px)}
-  header h1{font-size: clamp(19px, 6.2vw, 24px)}
-}
